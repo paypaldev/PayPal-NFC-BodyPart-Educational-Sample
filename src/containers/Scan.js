@@ -1,20 +1,21 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Scanner from '../components/Scanner/Scanner';
+import BodyPart from '../components/BodyPart/BodyPart';
+import Modal from '../components/Modal/Modal';
 import { ActionsContext } from '../contexts/context';
 
 const Scan = () => {
-    const [message, setMessage] = useState('');
-    const [serialNumber, setSerialNumber] = useState('');
     const { actions, setActions} = useContext(ActionsContext);
+    const [data, setData] = useState(null);
 
     const scan = useCallback(async() => {
 
         if ('NDEFReader' in window) { 
             try {
                 const ndef = new window.NDEFReader();
-                await ndef.scan();
-                
-                console.log("Scan started successfully.");
+                const ctrl = new AbortController();
+                await ndef.scan({ signal: ctrl.signal });
+
                 ndef.onreadingerror = () => {
                     console.log("Cannot read data from the NFC tag. Try another one?");
                 };
@@ -22,10 +23,11 @@ const Scan = () => {
                 ndef.onreading = event => {
                     console.log("NDEF message read.");
                     onReading(event);
-                    setActions({
-                        scan: 'scanned',
-                        write: null
-                    });
+                    ctrl.abort();
+                };
+
+                ctrl.signal.onabort = () => {
+                    console.log("We're done waiting for NDEF messages.");
                 };
 
             } catch(error){
@@ -34,20 +36,18 @@ const Scan = () => {
         }
     },[setActions]);
 
-    const onReading = ({message, serialNumber}) => {
-        setSerialNumber(serialNumber);
+    const onReading = ({message}) => {
         for (const record of message.records) {
-            switch (record.recordType) {
-                case "text":
-                    const textDecoder = new TextDecoder(record.encoding);
-                    setMessage(textDecoder.decode(record.data));
-                    break;
-                case "url":
-                    // TODO: Read URL record with record data.
-                    break;
-                default:
-                    // TODO: Handle other records with record data.
-                }
+            if (record.recordType === "mime") {
+                const textDecoder = new TextDecoder();
+                const jsonData = JSON.parse(textDecoder.decode(record.data));
+                console.log(jsonData);
+                setData(jsonData);
+                setActions({
+                    scan: 'scanned',
+                    write: null
+                });
+            }
         }
     };
 
@@ -55,16 +55,21 @@ const Scan = () => {
         scan();
     }, [scan]);
 
-    return(
-        <>
-            {actions.scan === 'scanned' ?  
-            <div>
-                <p>Serial Number: {serialNumber}</p>
-                <p>Message: {message}</p>
-            </div>
-            : <Scanner status={actions.scan}></Scanner> }
-        </>
-    );
+    if(actions.scan === 'scanned') {
+        return(
+            <Modal>
+                <BodyPart {...data}/>
+            </Modal>
+        )
+    }
+
+    if (actions.scan === 'scanning') {
+        return(
+            <Modal>
+               <Scanner/>
+            </Modal>
+        )
+    }
 };
 
 export default Scan;

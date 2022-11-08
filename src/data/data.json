@@ -1,0 +1,24 @@
+{
+    "bodyParts": [
+        {
+            "name": "arm",
+            "image": "https://images.unsplash.com/photo-1591302974398-10cb8ccb44c7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+            "url": "https://en.wikipedia.org/wiki/Arm"
+        },
+        {
+            "name": "leg",
+            "image": "https://images.unsplash.com/photo-1622143462763-c31bf56371e5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+            "url": "https://en.wikipedia.org/wiki/Leg"
+        },
+        {
+            "name": "head",
+            "image": "https://images.unsplash.com/photo-1587397845856-e6cf49176c70?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+            "url": "https://en.wikipedia.org/wiki/Head"
+        },
+        {
+            "name": "hand",
+            "image": "https://images.unsplash.com/photo-1617069897015-7d27a76232ed?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1590&q=80",
+            "url": "https://en.wikipedia.org/wiki/Hand"
+        }
+    ]
+}

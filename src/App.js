@@ -1,4 +1,4 @@
-import nfc from './nfc.svg';
+import logo from './humanoid.png';
 import './App.css';
 import Scan from './containers/Scan';
 import Write from './containers/Write';
@@ -18,11 +18,11 @@ function App() {
 
   return (
       <div className="App">
-        <img src={nfc} className="App-logo" alt="logo" />
-        <h1>NFC Tool</h1>
+        <img src={logo} className="App-logo" alt="logo" />
+        <h1>Body Parts</h1>
         <div className="App-container">
-          <button onClick={()=>onHandleAction({scan: 'scanning', write: null})} className="btn">Scan</button>
-          <button onClick={()=>onHandleAction({scan: null, write: 'writing'})} className="btn">Write</button>
+          <button onClick={()=>onHandleAction({scan: 'scanning', write: null})} className="btn">Scan Body Part</button>
+          <button onClick={()=>onHandleAction({scan: null, write: 'writing'})} className="btn">Set Body Part</button>
         </div>
         <ActionsContext.Provider value={actionsValue}>
           {scan && <Scan/>}
