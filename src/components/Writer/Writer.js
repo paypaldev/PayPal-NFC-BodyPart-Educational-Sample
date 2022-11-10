@@ -8,7 +8,7 @@ const Writer = ({writeFn}) => {
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
-        setInputs(values => ({...values, [name]: value}))
+        setInputs(values => ({...values, [name]: value.toLowerCase()}))
     }
 
     const onSave = (e) => {
