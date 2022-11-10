@@ -1,12 +1,10 @@
-# REACT NFC Body Parts Sample App
+# React NFC Body Parts Sample App
 
 ## About
 
 This is a simple sample app demostrating the usage of the [Web NFC API](https://w3c.github.io/web-nfc/).
 
 **To get the Web NFC API working you will need an Android Device with Google Chrome and your web app will need to be hosted using https.**
-
-This is the [sample app](https://react-nfc-90146.web.app/) in action.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
