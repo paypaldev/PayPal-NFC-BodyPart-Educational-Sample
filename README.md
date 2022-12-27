@@ -1,5 +1,24 @@
-# React NFC Body Parts Sample App
+![PayPal Developer Cover](https://github.com/paypaldev/.github/blob/main/pp-cover.png)
+<div align="center">
+  <a href="https://twitter.com/paypaldev" target="_blank">
+    <img alt="Twitter: PayPal Developer" src="https://img.shields.io/twitter/follow/paypaldev?style=social" />
+  </a>
+  <br />
+  <a href="https://twitter.com/paypaldev" target="_blank">Twitter</a>
+    <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+  <a href="https://www.paypal.com/us/home" target="_blank">PayPal</a>
+    <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+  <a href="https://developer.paypal.com/home" target="_blank">Docs</a>
+    <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+  <a href="https://github.com/paypaldev" target="_blank">Code Samples</a>
+    <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+  <a href="https://dev.to/paypaldeveloper" target="_blank">Blog</a>
+  <br />
+  <hr />
+</div>
 
+# React NFC Body Parts Sample App
+![alt NFC Tag](sc.png)
 ## About
 
 This is a simple sample app demostrating the usage of the [Web NFC API](https://w3c.github.io/web-nfc/).
@@ -53,44 +72,49 @@ This project uses 4 methods of the Web NFC API
 ### Scan, Reading, Reading Error
 
 ```javascript
-const scan = async() =>
-    if ("NDEFReader" in window) {
+const scan = useCallback(async() => {
+
+    if ('NDEFReader' in window) { 
         try {
             const ndef = new window.NDEFReader();
-            await ndef.scan();
+            const ctrl = new AbortController();
+            await ndef.scan({ signal: ctrl.signal });
 
-            console.log("Scan started successfully.");
             ndef.onreadingerror = () => {
                 console.log("Cannot read data from the NFC tag. Try another one?");
             };
-
-            ndef.onreading = (event) => {
+            
+            ndef.onreading = event => {
                 console.log("NDEF message read.");
-                onReading(event); //Find function below
+                onReading(event);
+                ctrl.abort();
             };
-        } catch (error) {
+
+            ctrl.signal.onabort = () => {
+                console.log("We're done waiting for NDEF messages.");
+            };
+
+        } catch(error){
             console.log(`Error! Scan failed to start: ${error}.`);
-        }
+        };
     }
-};
+},[setActions]);
 ```
 
 The **onReading** method grabs the message and serial number inside of the NFC tag, the uses the array of reacord inside of the message and decodes the information so its readable to humans.
 
 ```javascript
-const onReading = ({message, serialNumber}) => {
-    console.log(serialNumber);
+const onReading = ({message}) => {
     for (const record of message.records) {
-        switch (record.recordType) {
-            case "text":
-                const textDecoder = new TextDecoder(record.encoding);
-                console.log("Message": textDecoder.decode(record.data));
-                break;
-            case "url":
-                // TODO: Read URL record with record data.
-                break;
-            default:
-                // TODO: Handle other records with record data.
+        if (record.recordType === "mime") {
+            const textDecoder = new TextDecoder();
+            const jsonData = JSON.parse(textDecoder.decode(record.data));
+            console.log(jsonData);
+            setData(jsonData);
+            setActions({
+                scan: 'scanned',
+                write: null
+            });
         }
     }
 };
@@ -99,17 +123,23 @@ const onReading = ({message, serialNumber}) => {
 ### Write
 
 ```javascript
-const onWrite = () => {
-  try {
-    const ndef = new window.NDEFReader();
-    await ndef.write({
-      records: [{ recordType: "text", data: "Hellow World!" }],
-    });
-    console.log(`Value Saved!`);
-  } catch (error) {
-    console.log(error);
-  }
-};
+const onWrite = async(data) => {
+    try {
+        const ndef = new window.NDEFReader();
+        const encoder = new TextEncoder();
+        // This line will avoid showing the native NFC UI reader
+        await ndef.scan();
+        const jsonRecord = {
+            recordType: "mime",
+            mediaType: "application/json",
+            data: encoder.encode(JSON.stringify(data))
+        };
+        await ndef.write({records: [jsonRecord]});
+        alert(`Value Saved!`);
+    } catch (error) {
+        console.log(error);
+    }
+}
 ```
 
 ## Learn More & Resources
@@ -121,24 +151,20 @@ const onWrite = () => {
 - https://caniuse.com/webnfc
 - https://w3c.github.io/web-nfc/
 
-## Available Scripts
+### Run the project
 
-In the project directory, you can run:
+Run `npm install` to install all the project dependencies then run the project using
+`npm start`.
 
-### `yarn start`
-
-Runs the app in the development mode.\
+Runs the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
+The page will reload if you make edits.
 You will also see any lint errors in the console.
 
-### `yarn build`
+## PayPal Developer Community
+The PayPal Developer community helps you build your career, while also improving PayPal products and the developer experience. You’ll be able to contribute code and documentation, meet new people and learn from the open source community.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* Website: [developer.paypal.com](https://developer.paypal.com)
+* Twitter: [@paypaldev](https://twitter.com/paypaldev)
+* Github:  [@paypal](https://github.com/paypal)
